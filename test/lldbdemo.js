@@ -9,11 +9,11 @@ function my_listener(request, response) {
     case '/':
         console.log('lldbdemo.js: core dump list request');
         response.writeHead(200, "OK",{'Content-Type': 'text/html'});
-        response.write('<html><head><title>Diagnostic NPM Demo</title></head><body>');
-        response.write('<h2>Node Post-Mortem Diagnostics Server</h2>');
+        response.write('<html><head><title>Diagnostic Javascript API - NPM Demo</title></head><body>');
+        response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
 
         // Locate and list any core dumps
-        response.write('<p> Core dump repository:<p>');
+        response.write('<p> Core dumps found:<p>');
         files = fs.readdirSync('.');
         for (var i = 0; i < files.length; i++) {
             if (files[i].substring(0,4) == 'core' ) {
@@ -38,7 +38,7 @@ function my_listener(request, response) {
         });
         request.on('end', function(){
             response.writeHead(200,{"Content-Type": "text/html"});
-            response.write('<h2>Node Post-Mortem Diagnostics Server</h2>');
+            response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
             response.write('<p>Loading core dump: ' + inputData.split("=")[1] + '\n');
             llnode_module.loadDump(inputData.split("=")[1]);
             // Display thread stacks in a table
@@ -72,10 +72,20 @@ function my_listener(request, response) {
 var http_server = http.createServer(my_listener);
 http_server.listen(2000);
 
-console.log('Node Post-Mortem Diagnostic Server running, go to http://<machine>:2000/ or http://localhost:2000/');
+console.log('Diagnostic Javascript API - NPM Demo');
+console.log('Usage: node lldbdemo.js [-timeout=<timeout in minutes>]');
+console.log('Recommended Linux OS settings:\n\tulimit -c unlimited\n\t/proc/sys/kernel/core_pattern core.%p');
+console.log('To create a core dump, run: node --abort-on-uncaught-exception unknown.js');
+console.log('\nDemo running, open URL http://<machine>:2000/ or http://localhost:2000/');
 
-setTimeout(function(){
-    console.log('Node Post-Mortem Diagnostics Server closing down....');
-    process.exit(0); 
-}, 120000);
+// Set timeout if requested
+process.argv.forEach(function (val, index, array) {
+  if (val.substring(0,8) == '-timeout') {
+    console.log('lldbdemo.js: setting timeout to ' + (val.split("=")[1]) + ' minute(s)');
+    setTimeout(function() {
+      console.log('Diagnostic Javascript API NPM Demo closing down....');
+      process.exit(0); 
+    }, val.split("=")[1] * 1000 * 60);
+  }
+});
 
