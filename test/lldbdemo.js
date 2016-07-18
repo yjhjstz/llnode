@@ -40,7 +40,7 @@ function my_listener(request, response) {
             response.writeHead(200,{"Content-Type": "text/html"});
             response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
             response.write('<p>Loading core dump: ' + inputData.split("=")[1] + '\n');
-            llnode_module.loadDump(inputData.split("=")[1]);
+            llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
             response.write('<p><table border="1" style="width:100%">');
@@ -53,7 +53,7 @@ function my_listener(request, response) {
                     if (frame.substring(0,3) == '???'){
                         // skip unknown frame
                     } else {
-                        response.write(count++ + ': ' + frame);
+                        response.write(count++ + ': ' + frame + '\n');
                     }
                 }
                 response.write('</pre></td></tr>');

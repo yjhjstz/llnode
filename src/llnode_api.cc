@@ -22,20 +22,20 @@ static lldb::SBProcess process;
 llnode::v8::LLV8 llv8;
 
 /* Initialize the SB API and load the core dump */
-int initSBTarget(char *filename) {
+int initSBTarget(char *filename, char *executable) {
     if ((!loaded)) {
         lldb::SBDebugger::Initialize();
         debugger = lldb::SBDebugger::Create();
         loaded = true;
-        fprintf(stdout,"llnode_api.cc: SB API initialized\n");
+        // fprintf(stdout,"llnode_api.cc: SB API initialized\n");
     }
     // Single instance target for now
-    target = debugger.CreateTargetWithFileAndArch("/usr/bin/node",LLDB_ARCH_DEFAULT_64BIT);
+    target = debugger.CreateTargetWithFileAndArch(executable, LLDB_ARCH_DEFAULT_64BIT);
     process = target.LoadCore(filename);
 
     // Load V8 constants from postmortem data
     llv8.Load(target);
-    fprintf(stdout,"llnode_api.cc: SB loaded code dump %s\n",filename);
+    // fprintf(stdout,"llnode_api.cc: SB loaded code dump %s\n",filename);
     return 0;
 }
 
@@ -55,6 +55,7 @@ int getSBFrame(int threadIndex, int frameIndex, int buffer_size, char *buffer) {
 
     char* cursor = buffer;
     if (symbol.IsValid()) {
+        cursor += sprintf(cursor,"Native: ");
         cursor += sprintf(cursor,"%s",frame.GetFunctionName());
         lldb::SBModule module = frame.GetModule();
         lldb::SBFileSpec moduleFileSpec = module.GetFileSpec();
@@ -62,9 +63,7 @@ int getSBFrame(int threadIndex, int frameIndex, int buffer_size, char *buffer) {
         lldb::SBCompileUnit compileUnit = frame.GetCompileUnit();
         lldb::SBFileSpec compileUnitFileSpec = compileUnit.GetFileSpec();
         if (compileUnitFileSpec.GetDirectory() != NULL || compileUnitFileSpec.GetFilename() != NULL) {
-            cursor += sprintf(cursor,"\n\t [%s: %s]\n",compileUnitFileSpec.GetDirectory(),compileUnitFileSpec.GetFilename());
-        } else {
-            cursor += sprintf(cursor,"\n");
+            cursor += sprintf(cursor,"\n\t [%s: %s]",compileUnitFileSpec.GetDirectory(),compileUnitFileSpec.GetFilename());
         }
     } else {
         // V8 frame
@@ -75,10 +74,14 @@ int getSBFrame(int threadIndex, int frameIndex, int buffer_size, char *buffer) {
         // Skip invalid frames
         // fprintf(stdout,"JS string is [%s]\n",res.c_str());
         if (err.Fail() || strlen(res.c_str()) == 0 || strncmp(res.c_str(),"<",1) ==0) {
-            cursor += sprintf(cursor,"???");
+            if (strncmp(res.c_str(),"<",1) ==0) {
+                cursor += sprintf(cursor,"Unknown: %s", res.c_str());
+            } else {
+                cursor += sprintf(cursor,"???");    
+            }
         } else {
             // V8 symbol
-            cursor += sprintf(cursor,"Javascript: %s\n", res.c_str());
+            cursor += sprintf(cursor,"Javascript: %s", res.c_str());
         }
     }
     return 0;

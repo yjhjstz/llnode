@@ -16,14 +16,15 @@ using v8::Number;
 void LoadDump(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
 
-  if (args.Length() < 1) {
+  if (args.Length() < 2) {
     isolate->ThrowException(Exception::TypeError(
-        String::NewFromUtf8(isolate, "Wrong number of arguments")));
+        String::NewFromUtf8(isolate, "Wrong amount of args")));
     return;
   }
 
   String::Utf8Value filename(args[0]);
-  initSBTarget(*filename);
+  String::Utf8Value executable(args[1]);
+  initSBTarget(*filename, *executable);
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, "OK"));
 }
 
