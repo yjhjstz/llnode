@@ -11,6 +11,9 @@
 #include "src/llv8.h"
 #include "string.h"
 
+#include <dlfcn.h>
+
+
 namespace llnode {
 
 static bool loaded = false;
@@ -24,18 +27,25 @@ llnode::v8::LLV8 llv8;
 /* Initialize the SB API and load the core dump */
 int initSBTarget(char *filename, char *executable) {
     if ((!loaded)) {
+        // load lldb.so
+        void* handle = dlopen("/usr/lib/x86_64-linux-gnu/liblldb-3.6.so", RTLD_LAZY | RTLD_GLOBAL);
+        if (!handle) {
+            printf("dlopen %s \n", dlerror());
+            exit(1);
+        }
         lldb::SBDebugger::Initialize();
         debugger = lldb::SBDebugger::Create();
         loaded = true;
-        // fprintf(stdout,"llnode_api.cc: SB API initialized\n");
+        fprintf(stdout,"llnode_api.cc: SB API initialized\n");
     }
+    
     // Single instance target for now
     target = debugger.CreateTargetWithFileAndArch(executable, LLDB_ARCH_DEFAULT_64BIT);
     process = target.LoadCore(filename);
 
     // Load V8 constants from postmortem data
     llv8.Load(target);
-    // fprintf(stdout,"llnode_api.cc: SB loaded code dump %s\n",filename);
+    fprintf(stdout,"llnode_api.cc: SB loaded code dump %s\n",filename);
     return 0;
 }
 

@@ -43,7 +43,8 @@ function my_listener(request, response) {
             llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
-            console.log(llnode_module.handleCmds('plugin load /media/psf/Home/Work/llnode-api/out/Release/lib.target/llnode.so'));
+            console.log(llnode_module.handleCmds('plugin load llnode.so'));
+            console.log(llnode_module.handleCmds('v8'));
             response.write('<p><table border="1" style="width:100%">');
             response.write('<tr><th><pre>Thread number</pre></th><th align=left><pre>Thread stack frames</pre></th></tr>');
             for (var j = 0; j < threads; j++){
