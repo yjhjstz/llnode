@@ -48,11 +48,27 @@ void GetFrame(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, buffer));
 }
 
+void HandleCmds(const FunctionCallbackInfo<Value>& args) {
+  Isolate* isolate = args.GetIsolate();
+  if (args.Length() < 1) {
+    isolate->ThrowException(Exception::TypeError(
+        String::NewFromUtf8(isolate, "Wrong amount of args")));
+    return;
+  }
+  char buffer[4096];
+  String::Utf8Value cmd(args[0]);
+  int ret = handleCommands(*cmd, buffer, 4096);
+  
+  args.GetReturnValue().Set(String::NewFromUtf8(isolate, buffer));
+  
+}
+
 void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "loadDump", LoadDump);
   NODE_SET_METHOD(exports, "getThreadCount", GetThreadCount);
   NODE_SET_METHOD(exports, "getFrameCount", GetFrameCount);
   NODE_SET_METHOD(exports, "getFrame", GetFrame);
+  NODE_SET_METHOD(exports, "handleCmds", HandleCmds);
 }
 
 NODE_MODULE(llnode_module, init)

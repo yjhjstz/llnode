@@ -87,4 +87,17 @@ int getSBFrame(int threadIndex, int frameIndex, int buffer_size, char *buffer) {
     return 0;
 }
 
+int handleCommands(const char* command_line, char *buffer, int buffer_size) {
+    lldb::SBCommandReturnObject command_result;
+    lldb::SBCommandInterpreter interpreter = debugger.GetCommandInterpreter();
+    interpreter.HandleCommand(command_line, command_result, false);
+    if (!command_result.Succeeded())
+    {
+        fprintf (stderr, "error: couldn't exec '%s'\n", command_result.GetError());
+        return 1;
+    }
+    strncpy(buffer, command_result.GetOutput(), buffer_size - 1);
+    return 0;
+}
+
 }  // namespace llnode

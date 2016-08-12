@@ -13,13 +13,12 @@ function my_listener(request, response) {
         response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
 
         // Locate and list any core dumps
-        response.write('<p> Core dumps found:<p>');
+        response.write('<p> Core dumps found:<br>');
         files = fs.readdirSync('.');
         for (var i = 0; i < files.length; i++) {
             if (files[i].substring(0,4) == 'core' ) {
                 var stats = fs.lstatSync('./' + files[i]);
-                response.write('<br>' + files[i]);
-                response.write('<br>' + stats.mtime);
+                response.write('<br>' + files[i] + '&emsp;' + stats.mtime);
             }
         }
         response.write('<p>');
@@ -33,6 +32,7 @@ function my_listener(request, response) {
     case '/formhandler':
         console.log('lldbdemo.js: form response');
         var inputData = 'null'
+
         request.on('data', function(input){
             inputData = input.toString();
         });
@@ -43,6 +43,7 @@ function my_listener(request, response) {
             llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
+            console.log(llnode_module.handleCmds('plugin load /media/psf/Home/Work/llnode-api/out/Release/lib.target/llnode.so'));
             response.write('<p><table border="1" style="width:100%">');
             response.write('<tr><th><pre>Thread number</pre></th><th align=left><pre>Thread stack frames</pre></th></tr>');
             for (var j = 0; j < threads; j++){
@@ -65,7 +66,7 @@ function my_listener(request, response) {
     default:
         response.writeHead(404, "Not found",{'Content-Type': 'text/html'});
         response.end('<html><head><title>404 - Not found</title></head><body><h1>Not found.</h1></body></html>');
-        console.log("lldbdemo.js: [404] " + req.method + " to " + req.url);
+        console.log("lldbdemo.js: [404] " + request.method + " to " + request.url);
     };
 }
 
