@@ -1,3 +1,4 @@
+#define __STDC_FORMAT_MACROS
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
