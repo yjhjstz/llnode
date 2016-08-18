@@ -45,7 +45,7 @@ function my_listener(request, response) {
             var threads = llnode_module.getThreadCount();
             console.log(llnode_module.handleCmds('plugin load llnode.so'));
             //console.log(llnode_module.handleCmds('help'));
-            //console.log(llnode_module.handleCmds('v8 nodeinfo'));
+            console.log(llnode_module.handleCmds('nodeinfo'));
             console.log(llnode_module.handleCmds('v8 bt'));
 
             response.write('<p><table border="1" style="width:100%">');

@@ -33,14 +33,10 @@ void logCb(const char *s, void *baton) {
 /* Initialize the SB API and load the core dump */
 int initSBTarget(char *filename, char *executable) {
     if ((!loaded)) {
-        // lldb.so
-        void* handle = dlopen("/usr/lib/x86_64-linux-gnu/liblldb-3.6.so", RTLD_LAZY | RTLD_GLOBAL);
-        if (!handle) {
-           printf("dlopen %s \n", dlerror());
-           exit(1);
-        }
+        // load lldb.so
+        // export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/liblldb-3.6.so^C
         lldb::SBDebugger::Initialize();
-        debugger = lldb::SBDebugger::Create(false, logCb, handle);
+        debugger = lldb::SBDebugger::Create(false, logCb, (void*)executable);
         loaded = true;
     }
     
