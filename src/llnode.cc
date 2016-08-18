@@ -195,6 +195,7 @@ bool ListCmd::DoExecute(SBDebugger d, char** cmd,
       line_from_switch = strtol(*start, nullptr, 10);
       if (errno) {
         result.SetError("Invalid line number");
+        result.SetStatus (eReturnStatusFailed);
         return false;
       }
       line_from_switch--;
@@ -206,6 +207,7 @@ bool ListCmd::DoExecute(SBDebugger d, char** cmd,
   }
   if (grab_line || (line_switch && line_from_switch < 0)) {
     result.SetError("Expected line number after -l");
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
@@ -229,6 +231,7 @@ bool ListCmd::DoExecute(SBDebugger d, char** cmd,
     std::string cmd = "source list ";
     cmd += full_cmd;
     interpreter.HandleCommand(cmd.c_str(), result, false);
+    result.SetStatus (eReturnStatusSuccessFinishResult);
     return true;
   }
 
@@ -244,6 +247,7 @@ bool ListCmd::DoExecute(SBDebugger d, char** cmd,
       reset_line, last_line, kDisplayLines, lines, lines_found, err);
   if (err.Fail()) {
     result.SetError(err.GetMessage());
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
   last_line = line_cursor;
@@ -252,7 +256,7 @@ bool ListCmd::DoExecute(SBDebugger d, char** cmd,
     result.Printf("  %d %s\n", line_cursor - lines_found + i + 1,
                   lines[i].c_str());
   }
-
+  result.SetStatus (eReturnStatusSuccessFinishResult);
   return true;
 }
 
