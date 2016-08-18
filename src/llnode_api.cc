@@ -12,7 +12,7 @@
 #include "string.h"
 
 #include <dlfcn.h>
-
+#include <unistd.h>
 
 namespace llnode {
 
@@ -24,6 +24,12 @@ static lldb::SBProcess process;
 
 llnode::v8::LLV8 llv8;
 
+//void (*LogOutputCallback) (const char *, void *baton);
+
+void logCb(const char *s, void *baton) {
+  fprintf(stderr, "%s", s);
+  fprintf(stderr, "handle %p\n", baton);
+}
 /* Initialize the SB API and load the core dump */
 int initSBTarget(char *filename, char *executable) {
     if ((!loaded)) {
@@ -34,9 +40,9 @@ int initSBTarget(char *filename, char *executable) {
             exit(1);
         }
         lldb::SBDebugger::Initialize();
-        debugger = lldb::SBDebugger::Create();
+        debugger = lldb::SBDebugger::Create(false, logCb, handle);
         loaded = true;
-        fprintf(stdout,"llnode_api.cc: SB API initialized\n");
+        fprintf(stdout,"handle init %p\n", handle);
     }
     
     // Single instance target for now
@@ -101,10 +107,13 @@ int handleCommands(const char* command_line, char *buffer, int buffer_size) {
     lldb::SBCommandReturnObject command_result;
     lldb::SBCommandInterpreter interpreter = debugger.GetCommandInterpreter();
     interpreter.HandleCommand(command_line, command_result, false);
+    fprintf(stderr, "cc:%s\n", command_line);
+    // todo timeout
     if (!command_result.Succeeded())
     {
-        fprintf (stderr, "error: couldn't exec '%s'\n", command_result.GetError());
-        return 1;
+        fprintf (stderr, "error: couldn't exec '%s', status = %d\n", 
+           command_result.GetError(), command_result.GetStatus());
+        //return 1;
     }
     strncpy(buffer, command_result.GetOutput(), buffer_size - 1);
     return 0;

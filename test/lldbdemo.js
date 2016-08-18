@@ -44,7 +44,8 @@ function my_listener(request, response) {
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
             console.log(llnode_module.handleCmds('plugin load llnode.so'));
-            console.log(llnode_module.handleCmds('v8'));
+            //console.log(llnode_module.handleCmds('help'));
+            console.log(llnode_module.handleCmds('v8 bt'));
             response.write('<p><table border="1" style="width:100%">');
             response.write('<tr><th><pre>Thread number</pre></th><th align=left><pre>Thread stack frames</pre></th></tr>');
             for (var j = 0; j < threads; j++){

@@ -29,7 +29,7 @@ var server = http.createServer(function (req, res) {
 
   res.write('analyse coredump \r\n');
   req.pipe(lldb.stdin);
-  lldb.stdout.pipe(res);
+  
   var rl = readline.createInterface({
    input: req, output: res
   });
@@ -38,7 +38,8 @@ var server = http.createServer(function (req, res) {
    rl.on('line', (input) => {
       rl.prompt();
    })
-
+   
+   lldb.stdout.pipe(res);
   // log
   console.log(req.headers['user-agent'])
 

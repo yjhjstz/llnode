@@ -57,6 +57,7 @@ bool BacktraceCmd::DoExecute(SBDebugger d, char** cmd,
   SBThread thread = target.GetProcess().GetSelectedThread();
   if (!thread.IsValid()) {
     result.SetError("No valid process, please start something\n");
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
@@ -65,6 +66,7 @@ bool BacktraceCmd::DoExecute(SBDebugger d, char** cmd,
       (cmd != nullptr && *cmd != nullptr) ? strtol(*cmd, nullptr, 10) : -1;
   if ((number == 0 && errno == EINVAL) || (number < 0 && number != -1)) {
     result.SetError("Invalid number of frames");
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
@@ -107,8 +109,9 @@ bool BacktraceCmd::DoExecute(SBDebugger d, char** cmd,
                                           : "    frame #%u: 0x%016llx %s\n",
                   i, static_cast<unsigned long long int>(frame.GetPC()),
                   res.c_str());
+    
   }
-
+  result.SetStatus (eReturnStatusSuccessFinishResult);
   return true;
 }
 
@@ -121,12 +124,14 @@ bool PrintCmd::DoExecute(SBDebugger d, char** cmd,
     } else {
       result.SetError("USAGE: v8 print expr\n");
     }
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
   SBTarget target = d.GetSelectedTarget();
   if (!target.IsValid()) {
     result.SetError("No valid process, please start something\n");
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
@@ -145,6 +150,7 @@ bool PrintCmd::DoExecute(SBDebugger d, char** cmd,
     SBStream desc;
     if (!value.GetError().GetDescription(desc)) return false;
     result.SetError(desc.GetData());
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
@@ -156,11 +162,12 @@ bool PrintCmd::DoExecute(SBDebugger d, char** cmd,
   std::string res = v8_value.Inspect(&inspect_options, err);
   if (err.Fail()) {
     result.SetError("Failed to evaluate expression");
+    result.SetStatus (eReturnStatusFailed);
     return false;
   }
 
   result.Printf("%s\n", res.c_str());
-
+  result.SetStatus (eReturnStatusSuccessFinishResult);
   return true;
 }
 
