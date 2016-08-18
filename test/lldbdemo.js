@@ -43,7 +43,7 @@ function my_listener(request, response) {
             llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
-            //console.log(llnode_module.handleCmds('plugin load llnode.so'));
+            console.log(llnode_module.handleCmds('plugin load llnode.so'));
             //console.log(llnode_module.handleCmds('help'));
             //console.log(llnode_module.handleCmds('v8 nodeinfo'));
             console.log(llnode_module.handleCmds('v8 bt'));
