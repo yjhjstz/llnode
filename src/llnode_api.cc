@@ -34,11 +34,11 @@ void logCb(const char *s, void *baton) {
 int initSBTarget(char *filename, char *executable) {
     if ((!loaded)) {
         // load lldb.so
-        void* handle = dlopen("/usr/lib/x86_64-linux-gnu/liblldb-3.6.so", RTLD_LAZY | RTLD_GLOBAL);
-        if (!handle) {
-            printf("dlopen %s \n", dlerror());
-            exit(1);
-        }
+        //void* handle = dlopen("/usr/lib/x86_64-linux-gnu/liblldb-3.6.so", RTLD_LAZY | RTLD_GLOBAL);
+        //if (!handle) {
+        //    printf("dlopen %s \n", dlerror());
+        //    exit(1);
+        // }
         lldb::SBDebugger::Initialize();
         debugger = lldb::SBDebugger::Create(false, logCb, handle);
         loaded = true;
