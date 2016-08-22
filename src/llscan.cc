@@ -65,7 +65,7 @@ bool FindObjectsCmd::DoExecute(SBDebugger d, char** cmd,
                   t->GetTotalInstanceSize(), t->GetTypeName().c_str());
     total_objects += t->GetInstanceCount();
   }
-  result.SetStatus (eReturnStatusSuccessFinishResult);
+  result.SetStatus(eReturnStatusSuccessFinishResult);
   return true;
 }
 
@@ -73,14 +73,14 @@ bool FindInstancesCmd::DoExecute(SBDebugger d, char** cmd,
                                  SBCommandReturnObject& result) {
   if (*cmd == NULL) {
     result.SetError("USAGE: v8 findjsinstances [-Fm] instance_name\n");
-    result.SetStatus (eReturnStatusFailed);
+    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
   SBTarget target = d.GetSelectedTarget();
   if (!target.IsValid()) {
     result.SetError("No valid process, please start something\n");
-    result.SetStatus (eReturnStatusFailed);
+    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
@@ -112,7 +112,7 @@ bool FindInstancesCmd::DoExecute(SBDebugger d, char** cmd,
 
   } else {
     result.Printf("No objects found with type name %s\n", type_name.c_str());
-    result.SetStatus (eReturnStatusFailed);
+    result.SetStatus(eReturnStatusFailed);
   }
   result.SetStatus(eReturnStatusSuccessFinishResult);
   return true;
@@ -199,29 +199,6 @@ bool NodeInfoCmd::DoExecute(SBDebugger d, char** cmd,
         for (std::vector<std::string>::iterator key = version_keys.begin();
              key != version_keys.end(); ++key) {
           v8::Value ver_val = versions_obj.GetProperty(*key, err);
-          if (ver_val.v8() != nullptr) {
-            v8::String ver_str(ver_val);
-            result.Printf("    %s = %s\n", key->c_str(),
-                          ver_str.ToString(err).c_str());
-          }
-        }
-      }
-
-      v8::Value release_val = process_obj.GetProperty("release", err);
-      if (release_val.v8() != nullptr) {
-        v8::JSObject release_obj(release_val);
-
-        std::vector<std::string> release_keys;
-
-        // Get the list of keys on an object as strings.
-        release_obj.Keys(release_keys, err);
-
-        result.Printf("Release Info (process.release=0x%" PRIx64 "):\n",
-                      release_val.raw());
-
-        for (std::vector<std::string>::iterator key = release_keys.begin();
-             key != release_keys.end(); ++key) {
-          v8::Value ver_val = release_obj.GetProperty(*key, err);
           if (ver_val.v8() != nullptr) {
             v8::String ver_str(ver_val);
             result.Printf("    %s = %s\n", key->c_str(),

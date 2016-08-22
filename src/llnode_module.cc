@@ -1,5 +1,6 @@
 // Javascript module API for llnode/lldb
 #include <node.h>
+#include <node_object_wrap.h>
 #include "src/llnode_api.h"
 
 namespace llnode {
@@ -12,6 +13,9 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 using v8::Number;
+
+
+
 
 void LoadDump(const FunctionCallbackInfo<Value>& args) {
   Isolate* isolate = args.GetIsolate();
