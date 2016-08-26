@@ -1,4 +1,3 @@
-#define __STDC_FORMAT_MACROS
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
@@ -30,7 +29,6 @@ bool FindObjectsCmd::DoExecute(SBDebugger d, char** cmd,
   SBTarget target = d.GetSelectedTarget();
   if (!target.IsValid()) {
     result.SetError("No valid process, please start something\n");
-    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
@@ -73,14 +71,12 @@ bool FindInstancesCmd::DoExecute(SBDebugger d, char** cmd,
                                  SBCommandReturnObject& result) {
   if (*cmd == NULL) {
     result.SetError("USAGE: v8 findjsinstances [-Fm] instance_name\n");
-    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
   SBTarget target = d.GetSelectedTarget();
   if (!target.IsValid()) {
     result.SetError("No valid process, please start something\n");
-    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
@@ -113,6 +109,7 @@ bool FindInstancesCmd::DoExecute(SBDebugger d, char** cmd,
   } else {
     result.Printf("No objects found with type name %s\n", type_name.c_str());
     result.SetStatus(eReturnStatusFailed);
+    return false;
   }
   result.SetStatus(eReturnStatusSuccessFinishResult);
   return true;
@@ -123,7 +120,6 @@ bool NodeInfoCmd::DoExecute(SBDebugger d, char** cmd,
   SBTarget target = d.GetSelectedTarget();
   if (!target.IsValid()) {
     result.SetError("No valid process, please start something\n");
-    result.SetStatus(eReturnStatusFailed);
     return false;
   }
 
