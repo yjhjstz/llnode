@@ -102,7 +102,7 @@ int handleCommands(const char* command_line, char *buffer, int buffer_size) {
     lldb::SBCommandReturnObject command_result;
     lldb::SBCommandInterpreter interpreter = debugger.GetCommandInterpreter();
     interpreter.HandleCommand(command_line, command_result, false);
-    fprintf(stderr, "cc:%s\n", command_line);
+    //fprintf(stderr, "cc:%s\n", command_line);
     // todo timeout
     if (!command_result.Succeeded())
     {

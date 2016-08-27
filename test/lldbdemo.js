@@ -43,8 +43,8 @@ function my_listener(request, response) {
             llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
-            console.log(llnode_module.loadPlugin('llnode.so'));
-            console.log(llnode_module.nodeinfo());
+            //console.log(llnode_module.loadPlugin('llnode.so'));
+            //console.log(llnode_module.nodeinfo());
             console.log(llnode_module.findjsobjects());
 
             response.write('<p><table border="1" style="width:100%">');
