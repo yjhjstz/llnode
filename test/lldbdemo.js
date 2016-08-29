@@ -37,9 +37,11 @@ function my_listener(request, response) {
             inputData = input.toString();
         });
         request.on('end', function(){
+            var core_file = inputData.split("=")[1];
             response.writeHead(200,{"Content-Type": "text/html"});
             response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
-            response.write('<p>Loading core dump: ' + inputData.split("=")[1] + '\n');
+            response.write('<p>Loading core dump: ' + core_file + '\n');
+            process.env.LLNODE_RANGESFILE = core_file + '.ranges';
             llnode_module.loadDump(inputData.split("=")[1], process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();

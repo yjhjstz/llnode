@@ -56,8 +56,8 @@ bool FindObjectsCmd::DoExecute(SBDebugger d, char** cmd,
   result.Printf(" Instances  Total Size Name\n");
   result.Printf(" ---------- ---------- ----\n");
 
-  for (std::vector<TypeRecord*>::iterator it = sorted_by_count.begin();
-       it != sorted_by_count.end(); ++it) {
+  for (std::vector<TypeRecord*>::reverse_iterator it = sorted_by_count.rbegin();
+       it != sorted_by_count.rend(); ++it) {
     TypeRecord* t = *it;
     result.Printf(" %10" PRId64 " %10" PRId64 " %s\n", t->GetInstanceCount(),
                   t->GetTotalInstanceSize(), t->GetTypeName().c_str());
