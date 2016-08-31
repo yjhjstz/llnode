@@ -14,10 +14,10 @@ function my_listener(request, response) {
 
         // Locate and list any core dumps
         response.write('<p> Core dumps found:<br>');
-        files = fs.readdirSync('.');
+        files = fs.readdirSync('/data');
         for (var i = 0; i < files.length; i++) {
             if (files[i].substring(0,4) == 'core' ) {
-                var stats = fs.lstatSync('./' + files[i]);
+                var stats = fs.lstatSync('/data/' + files[i]);
                 response.write('<br>' + files[i] + '&emsp;' + stats.mtime);
             }
         }

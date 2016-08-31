@@ -24,7 +24,7 @@ RUN ./gyp_llnode -Dlldb_dir=/usr/lib/llvm-3.8/
 # complier *.so
 RUN make -C out && make install-linux
 
-#RUN npm install --unsafe-perm
+RUN node-gyp rebuild
 
 EXPOSE 2000
 
