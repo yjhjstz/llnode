@@ -41,7 +41,7 @@ function my_listener(request, response) {
             inputData = input.toString();
         });
         request.on('end', function(){
-            const core = inputData.split("=")[1];
+            const core = '/data/' + inputData.split("=")[1];
             // gen core ranges
             const corerange = core + '.ranges';
 
