@@ -1,7 +1,11 @@
 // Test/demo for prototype llnode Javascript API
-var http = require("http");
+const http = require("http");
 const llnode_module = require('../build/Release/llnode_module');
 const fs = require('fs');
+const path = require('path');
+const spawnSync = require('child_process').spawnSync;
+
+const DIR = path.dirname(process.cwd());
 
 function my_listener(request, response) {
 
@@ -37,17 +41,23 @@ function my_listener(request, response) {
             inputData = input.toString();
         });
         request.on('end', function(){
-            var core_file = inputData.split("=")[1];
+            const core = inputData.split("=")[1];
+            // gen core ranges
+            const corerange = core + '.ranges';
+
+            var range = spawnSync(DIR + '/scripts/readelf2segments.py', [core]);
+            fs.writeFileSync(corerange, range.stdout);
+
             response.writeHead(200,{"Content-Type": "text/html"});
             response.write('<h2>Diagnostic Javascript API - NPM Demo</h2>');
-            response.write('<p>Loading core dump: ' + core_file + '\n');
-            process.env.LLNODE_RANGESFILE = core_file + '.ranges';
-            llnode_module.loadDump(inputData.split("=")[1], process.env._);
+            response.write('<p>Loading core dump: ' + core + '\n');
+            process.env.LLNODE_RANGESFILE = corerange;
+            llnode_module.loadDump(core, process.env._);
             // Display thread stacks in a table
             var threads = llnode_module.getThreadCount();
             //console.log(llnode_module.loadPlugin('llnode.so'));
             //console.log(llnode_module.nodeinfo());
-            console.log(llnode_module.findjsobjects());
+            //console.log(llnode_module.findjsobjects());
 
             response.write('<p><table border="1" style="width:100%">');
             response.write('<tr><th><pre>Thread number</pre></th><th align=left><pre>Thread stack frames</pre></th></tr>');
