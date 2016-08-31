@@ -78,7 +78,7 @@ double LLV8::LoadDouble(int64_t addr, Error& err) {
   }
 
   err = Error::Ok();
-  return *reinterpret_cast<double*>(&value);
+  return value;
 }
 
 
@@ -1500,11 +1500,11 @@ Value JSObject::GetDescriptorProperty(std::string key_name, Map map,
     int64_t index = descriptors.FieldIndex(details) - in_object_count;
 
     if (descriptors.IsDoubleField(details)) {
-      double value;
+      //double value;
       if (index < 0) {
-        value = GetInObjectValue<double>(instance_size, index, err);
+        GetInObjectValue<double>(instance_size, index, err);
       } else {
-        value = extra_properties.Get<double>(index, err);
+        extra_properties.Get<double>(index, err);
       }
 
       if (err.Fail()) return Value();
