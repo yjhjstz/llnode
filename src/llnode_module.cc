@@ -55,11 +55,12 @@ void GetFrame(const FunctionCallbackInfo<Value>& args) {
 
 
 #define FUNC_TYPE_LIST(V)   \
-  V("jsstack", Jsstack)     \
+  V("jssource", Jssource)   \
   V("nodeinfo", Nodeinfo)   \
   V("findjsobjects", Findjsobjects) \
 
 #define FUNC_TYPE_LIST_ARG1(V)   \
+  V("jsstack", Jsstack)          \
   V("jsprint", JsPrint)          \
   V("findjsinstances", Findjsinstances) 
 
