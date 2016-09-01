@@ -53,30 +53,17 @@ void GetFrame(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(String::NewFromUtf8(isolate, buffer));
 }
 
-void LoadPlugin(const FunctionCallbackInfo<Value>& args) {
-  Isolate* isolate = args.GetIsolate();
-  if (args.Length() < 1) {
-    isolate->ThrowException(Exception::TypeError(
-        String::NewFromUtf8(isolate, "Wrong amount of args")));
-    return;
-  }
-  char buffer[4096];
-  String::Utf8Value path(args[0]);
-  std::string plugin = "plugin load " + std::string(*path);
-  
-  handleCommands(plugin.c_str(), buffer, 4096);
-  
-  args.GetReturnValue().Set(String::NewFromUtf8(isolate, buffer));
-  
-}
 
 #define FUNC_TYPE_LIST(V)   \
   V("jsstack", Jsstack)     \
   V("nodeinfo", Nodeinfo)   \
-  V("Jsprint", Jsprint)     \
   V("findjsobjects", Findjsobjects) \
+
+#define FUNC_TYPE_LIST_ARG1(V)   \
+  V("jsprint", JsPrint)          \
   V("findjsinstances", Findjsinstances) 
 
+// not args
 #define F(cmd, name)                                  \
   void GetV8##name(const FunctionCallbackInfo<Value>& args) {        \
     char buffer[4096];                                               \
@@ -87,21 +74,41 @@ void LoadPlugin(const FunctionCallbackInfo<Value>& args) {
 FUNC_TYPE_LIST(F)
 #undef F
 
+// args0
+#define F1(cmd, name)                                  \
+  void GetV8##name(const FunctionCallbackInfo<Value>& args) {        \
+    char buffer[4096];                                               \
+    Isolate* isolate = args.GetIsolate();                            \
+    if (args.Length() < 1) {                                         \
+      isolate->ThrowException(Exception::TypeError(                  \
+        String::NewFromUtf8(isolate, "Wrong amount of args")));      \
+      return;                                                        \
+    }                                                                \
+    String::Utf8Value expr(args[0]);                                 \
+    std::string cmdline = cmd + std::string(" ") + std::string(*expr);\
+    handleCommands(cmdline.c_str(), buffer, 4096);                   \
+    args.GetReturnValue().Set(String::NewFromUtf8(isolate, buffer)); \
+  }
+FUNC_TYPE_LIST_ARG1(F1)
+#undef F1
+
 
 void init(Local<Object> exports) {
   NODE_SET_METHOD(exports, "loadDump", LoadDump);
   NODE_SET_METHOD(exports, "getThreadCount", GetThreadCount);
   NODE_SET_METHOD(exports, "getFrameCount", GetFrameCount);
   NODE_SET_METHOD(exports, "getFrame", GetFrame);
-  NODE_SET_METHOD(exports, "loadPlugin", LoadPlugin);
 #define S(cmd, name) NODE_SET_METHOD(exports, cmd, GetV8##name);
 FUNC_TYPE_LIST(S)
-#undef Sake
+FUNC_TYPE_LIST_ARG1(S)
+#undef S
 
 }
 
 NODE_MODULE(llnode_module, init)
 
 #undef FUNC_TYPE_LIST
+#undef FUNC_TYPE_LIST_ARG1
+
 }  // namespace llnode
 
